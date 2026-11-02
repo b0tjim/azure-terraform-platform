@@ -3,7 +3,7 @@
 Terraform that hosts the [bakery-orders-api](https://github.com/b0tjim/bakery-orders-api) container on Azure.
 No Azure credentials are used in development: nothing here is ever planned or applied from the sandbox.
 
-- [ ] 1. Repo skeleton: README stub, .gitignore, .editorconfig, LICENSE
+- [x] 1. Repo skeleton: README stub, .gitignore, .editorconfig, LICENSE
 - [ ] 2. Root Terraform config: versions.tf, providers.tf, variables.tf, outputs.tf
 - [ ] 3. Remote state: azurerm backend block (partial config) + `scripts/bootstrap-state.sh` to create the storage account
 - [ ] 4. Module `resource-group` (naming + tags)

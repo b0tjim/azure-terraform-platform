@@ -1,0 +1,11 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfplan
+override.tf
+override.tf.json
+.terraform.tfstate.lock.info
+# real variable values may hold secrets; envs/*.tfvars are committed on purpose
+*.auto.tfvars
+secrets.tfvars
