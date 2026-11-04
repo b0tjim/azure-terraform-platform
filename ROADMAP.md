@@ -8,7 +8,7 @@ No Azure credentials are used in development: nothing here is ever planned or ap
 - [x] 3. Remote state: azurerm backend block (partial config) + `scripts/bootstrap-state.sh` to create the storage account
 - [x] 4. Module `resource-group` (naming + tags)
 - [x] 5. Module `log-analytics` workspace
-- [ ] 6. Module `postgres` (Flexible Server, database, firewall rule for Azure services)
+- [x] 6. Module `postgres` (Flexible Server, database, firewall rule for Azure services)
 - [ ] 7. Module `key-vault` (RBAC mode) storing the generated DB password
 - [ ] 8. Module `container-app` (Container Apps environment wired to Log Analytics + app pulling the GHCR image)
 - [ ] 9. Container App secret from Key Vault via user-assigned managed identity; `DATABASE_URL` env wiring
