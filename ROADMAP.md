@@ -9,7 +9,7 @@ No Azure credentials are used in development: nothing here is ever planned or ap
 - [x] 4. Module `resource-group` (naming + tags)
 - [x] 5. Module `log-analytics` workspace
 - [x] 6. Module `postgres` (Flexible Server, database, firewall rule for Azure services)
-- [ ] 7. Module `key-vault` (RBAC mode) storing the generated DB password
+- [x] 7. Module `key-vault` (RBAC mode) storing the generated DB password
 - [ ] 8. Module `container-app` (Container Apps environment wired to Log Analytics + app pulling the GHCR image)
 - [ ] 9. Container App secret from Key Vault via user-assigned managed identity; `DATABASE_URL` env wiring
 - [ ] 10. Compose modules in the root config and add outputs (app URL, vault name)
