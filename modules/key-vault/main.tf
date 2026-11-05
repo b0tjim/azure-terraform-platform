@@ -28,3 +28,12 @@ resource "azurerm_key_vault_secret" "db_password" {
   # The role assignment can take a moment to propagate, so create it first.
   depends_on = [azurerm_role_assignment.deployer]
 }
+
+# The app reads one DATABASE_URL variable, so the full connection string is stored as a secret.
+resource "azurerm_key_vault_secret" "database_url" {
+  name         = "database-url"
+  value        = var.database_url
+  key_vault_id = azurerm_key_vault.this.id
+
+  depends_on = [azurerm_role_assignment.deployer]
+}

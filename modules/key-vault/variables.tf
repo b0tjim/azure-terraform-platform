@@ -40,3 +40,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "database_url" {
+  description = "Full SQLAlchemy connection string for the app, stored as the database-url secret."
+  type        = string
+  sensitive   = true
+}
