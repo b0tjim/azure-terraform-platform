@@ -43,3 +43,21 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "postgres_sku_name" {
+  description = "PostgreSQL Flexible Server SKU."
+  type        = string
+  default     = "B_Standard_B1ms"
+}
+
+variable "min_replicas" {
+  description = "Minimum app replicas (0 scales to zero)."
+  type        = number
+  default     = 0
+}
+
+variable "max_replicas" {
+  description = "Maximum app replicas."
+  type        = number
+  default     = 1
+}
