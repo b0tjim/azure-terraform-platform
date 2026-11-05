@@ -13,7 +13,7 @@ No Azure credentials are used in development: nothing here is ever planned or ap
 - [x] 8. Module `container-app` (Container Apps environment wired to Log Analytics + app pulling the GHCR image)
 - [x] 9. Container App secret from Key Vault via user-assigned managed identity; `DATABASE_URL` env wiring
 - [x] 10. Compose modules in the root config and add outputs (app URL, vault name)
-- [ ] 11. `envs/dev.tfvars` and `envs/prod.tfvars` (sizes, replicas, SKUs)
+- [x] 11. `envs/dev.tfvars` and `envs/prod.tfvars` (sizes, replicas, SKUs)
 - [ ] 12. CI: `terraform fmt -check` and `terraform validate` (backend disabled)
 - [ ] 13. CI: tflint with azurerm ruleset and `.tflint.hcl`
 - [ ] 14. CI: checkov scan, with documented skips for deliberate cost tradeoffs
