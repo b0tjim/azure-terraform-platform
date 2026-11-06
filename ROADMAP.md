@@ -15,7 +15,7 @@ No Azure credentials are used in development: nothing here is ever planned or ap
 - [x] 10. Compose modules in the root config and add outputs (app URL, vault name)
 - [x] 11. `envs/dev.tfvars` and `envs/prod.tfvars` (sizes, replicas, SKUs)
 - [x] 12. CI: `terraform fmt -check` and `terraform validate` (backend disabled)
-- [ ] 13. CI: tflint with azurerm ruleset and `.tflint.hcl`
+- [x] 13. CI: tflint with azurerm ruleset and `.tflint.hcl`
 - [ ] 14. CI: checkov scan, with documented skips for deliberate cost tradeoffs
 - [ ] 15. Plan workflow: OIDC `azure/login`, skips cleanly when Azure vars are absent
 - [ ] 16. Apply workflow gated behind a manual-approval `production` environment, also skips cleanly
