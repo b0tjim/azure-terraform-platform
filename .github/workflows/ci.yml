@@ -37,3 +37,13 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Lint root and modules
         run: tflint --recursive
+
+  checkov:
+    name: checkov
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          config_file: .checkov.yaml

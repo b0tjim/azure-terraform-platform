@@ -23,6 +23,7 @@ resource "azurerm_role_assignment" "deployer" {
 resource "azurerm_key_vault_secret" "db_password" {
   name         = "db-password"
   value        = var.db_password
+  content_type = "text/plain"
   key_vault_id = azurerm_key_vault.this.id
 
   # The role assignment can take a moment to propagate, so create it first.
@@ -33,6 +34,7 @@ resource "azurerm_key_vault_secret" "db_password" {
 resource "azurerm_key_vault_secret" "database_url" {
   name         = "database-url"
   value        = var.database_url
+  content_type = "text/plain"
   key_vault_id = azurerm_key_vault.this.id
 
   depends_on = [azurerm_role_assignment.deployer]

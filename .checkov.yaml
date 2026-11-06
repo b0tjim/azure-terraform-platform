@@ -1,0 +1,13 @@
+framework:
+  - terraform
+quiet: true
+compact: true
+# Deliberate cost/simplicity tradeoffs for a portfolio project (see README).
+skip-check:
+  - CKV_AZURE_109   # Key Vault firewall: Container Apps has no fixed egress IP on the consumption plan
+  - CKV_AZURE_189   # Key Vault public access: needs VNet integration, which adds a paid NAT/private endpoint
+  - CKV2_AZURE_32   # Key Vault private endpoint: ~$7/mo each, not worth it here
+  - CKV2_AZURE_57   # Postgres private endpoint: same cost reasoning
+  - CKV2_AZURE_26   # Firewall rule 0.0.0.0 is the "allow Azure services" rule the app needs without a VNet
+  - CKV_AZURE_136   # Geo-redundant backups: doubles backup storage cost; fine for a demo
+  - CKV_AZURE_41    # Secret expiry: rotation is manual here; would be required in a real production setup
