@@ -1,0 +1,55 @@
+name: Apply
+
+# Runs `terraform apply` against Azure using OIDC (no stored secrets).
+# Manual only, and gated: the `production` environment must have required
+# reviewers configured (Settings > Environments) so a human approves each run.
+# Skips cleanly unless the Azure repo variables are set (see README).
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to apply
+        type: choice
+        options: [dev, prod]
+        default: dev
+
+permissions:
+  id-token: write # request the OIDC token for azure/login
+  contents: read
+
+jobs:
+  apply:
+    name: terraform apply
+    runs-on: ubuntu-latest
+    environment: production # approval gate
+    if: >-
+      vars.AZURE_CLIENT_ID != '' &&
+      vars.AZURE_TENANT_ID != '' &&
+      vars.AZURE_SUBSCRIPTION_ID != '' &&
+      vars.TFSTATE_STORAGE_ACCOUNT != ''
+    env:
+      ENVIRONMENT: ${{ inputs.environment }}
+      ARM_USE_OIDC: "true"
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: terraform init
+        run: |
+          terraform init -input=false \
+            -backend-config="resource_group_name=${{ vars.TFSTATE_RESOURCE_GROUP || 'rg-bakery-tfstate' }}" \
+            -backend-config="storage_account_name=${{ vars.TFSTATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=tfstate" \
+            -backend-config="key=bakery-${ENVIRONMENT}.tfstate"
+      - name: terraform apply
+        run: terraform apply -input=false -auto-approve -var-file="envs/${ENVIRONMENT}.tfvars"

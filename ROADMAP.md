@@ -18,7 +18,7 @@ No Azure credentials are used in development: nothing here is ever planned or ap
 - [x] 13. CI: tflint with azurerm ruleset and `.tflint.hcl`
 - [x] 14. CI: checkov scan, with documented skips for deliberate cost tradeoffs
 - [x] 15. Plan workflow: OIDC `azure/login`, skips cleanly when Azure vars are absent
-- [ ] 16. Apply workflow gated behind a manual-approval `production` environment, also skips cleanly
+- [x] 16. Apply workflow gated behind a manual-approval `production` environment, also skips cleanly
 - [ ] 17. README: architecture diagram (Mermaid), module overview, how to run locally with `-backend=false`
 - [ ] 18. README: federated identity (OIDC) setup steps with `az` commands and required repo variables
 - [ ] 19. README: rough monthly cost estimate for dev and prod
