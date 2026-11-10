@@ -50,6 +50,73 @@ terraform validate
 ```
 
 A real `plan`/`apply` needs an Azure subscription and remote state; those steps run only in the
-GitHub workflows (see the roadmap for the OIDC setup docs).
+GitHub workflows (see below).
 
-More documentation (OIDC setup, cost estimate) will land here as the roadmap progresses.
+## Running the plan/apply workflows (OIDC, no stored secrets)
+
+`plan.yml` and `apply.yml` log in with `azure/login` using GitHub's OIDC token exchanged for a
+short-lived Azure token through a federated credential. Until the repo variables below exist, both
+workflows are skipped, so CI stays green without an Azure account. None of these steps have been run
+by the author (no subscription); they are the intended setup.
+
+```bash
+# 0. Log in and pick the subscription
+az login
+SUB=$(az account show --query id -o tsv)
+TENANT=$(az account show --query tenantId -o tsv)
+REPO=b0tjim/azure-terraform-platform
+
+# 1. Remote state storage account (prints the account name)
+scripts/bootstrap-state.sh eastus2
+
+# 2. App registration + service principal used by GitHub
+APP_ID=$(az ad app create --display-name gh-azure-terraform-platform --query appId -o tsv)
+az ad sp create --id "$APP_ID"
+
+# 3. Federated credentials: one per way the workflows authenticate
+#    (pull_request for plan.yml, branch main, and the "production" environment for apply.yml)
+for SUBJECT in "pull_request" "ref:refs/heads/main" "environment:production"; do
+  az ad app federated-credential create --id "$APP_ID" --parameters "{
+    \"name\": \"gh-${SUBJECT//[:\/]/-}\",
+    \"issuer\": \"https://token.actions.githubusercontent.com\",
+    \"subject\": \"repo:${REPO}:${SUBJECT}\",
+    \"audiences\": [\"api://AzureADTokenExchange\"]}"
+done
+
+# 4. Permissions. Owner (or Contributor + User Access Administrator) is needed because the
+#    key-vault module creates role assignments. Scope it to the subscription or a dedicated one.
+az role assignment create --assignee "$APP_ID" --role Owner --scope "/subscriptions/$SUB"
+# Reading/writing state with Entra auth is not used; the backend uses the same identity:
+az role assignment create --assignee "$APP_ID" --role "Storage Blob Data Contributor" \
+  --scope "/subscriptions/$SUB/resourceGroups/rg-bakery-tfstate"
+```
+
+Then in the GitHub repo:
+
+1. **Settings -> Secrets and variables -> Actions -> Variables**, add (these are IDs, not secrets):
+   `AZURE_CLIENT_ID` (= `$APP_ID`), `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`,
+   `TFSTATE_STORAGE_ACCOUNT`, and optionally `TFSTATE_RESOURCE_GROUP` (default `rg-bakery-tfstate`).
+2. **Settings -> Environments -> New environment** named `production`, enable **Required reviewers**
+   and add yourself. `apply.yml` pauses on this approval before touching Azure.
+3. Run **Actions -> Plan -> Run workflow** (pick `dev` or `prod`) and read the plan.
+4. Run **Actions -> Apply**, approve the `production` environment prompt, and it applies the same
+   `envs/<env>.tfvars`.
+
+## Rough monthly cost estimate
+
+Ballpark pay-as-you-go prices for `eastus2`, USD, checked against the Azure pricing pages from
+memory rather than the pricing calculator, so treat them as +/- 30%. Check the
+[Azure pricing calculator](https://azure.microsoft.com/pricing/calculator/) before deploying.
+
+| Item | dev | prod |
+| --- | --- | --- |
+| PostgreSQL compute (`B_Standard_B1ms` / `GP_Standard_D2s_v3`) | ~$13 | ~$125 |
+| PostgreSQL storage (32 GB) + backups | ~$4 | ~$4 |
+| Container Apps (0.25 vCPU / 0.5 GiB; dev scales to zero, prod 2 replicas always on) | ~$0-2 | ~$10-40 |
+| Log Analytics (first 5 GB/month free) | ~$0-2 | ~$0-5 |
+| Key Vault (a few operations) | <$1 | <$1 |
+| Remote state storage account | <$1 | shared |
+| **Total** | **~$20** | **~$150-180** |
+
+Biggest lever: the Postgres SKU. Run `terraform destroy -var-file=envs/dev.tfvars` when not using
+dev, and note a stopped Flexible Server still bills for storage.
