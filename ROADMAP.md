@@ -22,4 +22,4 @@ No Azure credentials are used in development: nothing here is ever planned or ap
 - [x] 17. README: architecture diagram (Mermaid), module overview, how to run locally with `-backend=false`
 - [x] 18. README: federated identity (OIDC) setup steps with `az` commands and required repo variables
 - [x] 19. README: rough monthly cost estimate for dev and prod
-- [x] 20. Badges, "what this demonstrates" section, final polish, tag `v0.1.0`
+- [x] 20. Badges, "what this demonstrates" section, final polish; `v0.1.0` tag skipped (tag push is denied from the automation sandbox), push it manually
